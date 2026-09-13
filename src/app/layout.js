@@ -3,6 +3,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CookieConsent from "@/components/common/CookieConsent";
 import { WebAppJsonLd } from "@/components/seo/JsonLd";
+import { ThemeProvider } from "@/hooks/useTheme";
 
 export const metadata = {
   metadataBase: new URL("https://savefrompro.com"),
@@ -50,15 +51,40 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="dark">
-      <body className="font-sans bg-gray-950 text-white antialiased">
-        <WebAppJsonLd />
-        <div className="min-h-screen flex flex-col">
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
-        <CookieConsent />
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var stored = localStorage.getItem('theme');
+                  if (stored !== 'light' && stored !== 'dark') {
+                    if (stored) localStorage.removeItem('theme');
+                    stored = null;
+                  }
+                  var isDark = stored ? stored === 'dark' : true;
+                  if (isDark) {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch(e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body className="font-sans bg-slate-50 text-slate-900 dark:bg-gray-950 dark:text-white antialiased transition-colors duration-200">
+        <ThemeProvider>
+          <WebAppJsonLd />
+          <div className="min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+          <CookieConsent />
+        </ThemeProvider>
       </body>
     </html>
   );

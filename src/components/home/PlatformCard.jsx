@@ -23,18 +23,20 @@ export default function PlatformCard({ platform }) {
   return (
     <Link
       href={`/${platform.slug}`}
-      className="group relative bg-gray-900/50 border border-gray-800/50 rounded-2xl p-6 hover:border-gray-700/50 hover:bg-gray-800/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20"
+      className="group relative bg-white dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800/50 rounded-2xl p-6 hover:border-slate-300 dark:hover:border-gray-700/50 hover:bg-slate-50 dark:hover:bg-gray-800/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl shadow-sm"
     >
       {/* Icon */}
       <div
-        className={`w-12 h-12 rounded-xl bg-gradient-to-br ${platform.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}
+        className={`w-12 h-12 rounded-xl bg-gradient-to-br ${platform.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-md`}
       >
         <IconComponent className="w-6 h-6 text-white" />
       </div>
 
       {/* Content */}
-      <h3 className="text-white font-semibold text-lg mb-2">{platform.name}</h3>
-      <p className="text-gray-400 text-sm leading-relaxed mb-4 line-clamp-2">
+      <h3 className="text-slate-900 dark:text-white font-semibold text-lg mb-2 group-hover:text-violet-600 dark:group-hover:text-violet-300 transition-colors">
+        {platform.name}
+      </h3>
+      <p className="text-slate-600 dark:text-gray-400 text-sm leading-relaxed mb-4 line-clamp-2 transition-colors">
         {platform.description}
       </p>
 
@@ -43,7 +45,7 @@ export default function PlatformCard({ platform }) {
         {platform.features.slice(0, 3).map((feature) => (
           <span
             key={feature}
-            className="text-xs px-2 py-0.5 rounded-md bg-gray-800/80 text-gray-400 border border-gray-700/30"
+            className="text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-gray-800/80 text-slate-600 dark:text-gray-400 border border-slate-200 dark:border-gray-700/30 font-medium"
           >
             {feature}
           </span>
@@ -51,7 +53,7 @@ export default function PlatformCard({ platform }) {
       </div>
 
       {/* CTA */}
-      <div className="flex items-center text-violet-400 text-sm font-medium group-hover:text-violet-300 transition-colors">
+      <div className="flex items-center text-violet-600 dark:text-violet-400 text-sm font-medium group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors">
         Download Now
         <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
       </div>

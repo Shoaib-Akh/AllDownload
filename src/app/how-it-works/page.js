@@ -35,14 +35,14 @@ const steps = [
 
 export default function HowItWorksPage() {
   return (
-    <div className="py-20">
+    <div className="py-20 transition-colors duration-200">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-6">
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white mb-6 transition-colors">
             How It <span className="gradient-text">Works</span>
           </h1>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg text-slate-600 dark:text-gray-400 max-w-2xl mx-auto transition-colors">
             Download videos from any supported platform in 3 simple steps. No software, no signup, no hassle.
           </p>
         </div>
@@ -52,19 +52,19 @@ export default function HowItWorksPage() {
           {steps.map((item) => (
             <div
               key={item.step}
-              className="flex flex-col sm:flex-row gap-6 items-start bg-gray-900/50 border border-gray-800/50 rounded-2xl p-8 hover:border-gray-700/50 transition-all"
+              className="flex flex-col sm:flex-row gap-6 items-start bg-white dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800/50 rounded-2xl p-8 hover:border-slate-300 dark:hover:border-gray-700/50 shadow-sm transition-all"
             >
               <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center flex-shrink-0 shadow-lg`}>
                 <item.icon className="w-7 h-7 text-white" />
               </div>
               <div>
-                <div className="text-violet-400 text-sm font-semibold mb-1">
+                <div className="text-violet-600 dark:text-violet-400 text-sm font-semibold mb-1">
                   Step {item.step}
                 </div>
-                <h2 className="text-xl font-bold text-white mb-2">
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2 transition-colors">
                   {item.title}
                 </h2>
-                <p className="text-gray-400 leading-relaxed">
+                <p className="text-slate-600 dark:text-gray-400 leading-relaxed transition-colors">
                   {item.description}
                 </p>
               </div>

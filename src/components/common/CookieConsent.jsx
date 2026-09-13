@@ -43,12 +43,12 @@ export default function CookieConsent() {
   if (!show) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50 bg-gray-950/95 border border-gray-800/90 rounded-2xl p-4 shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-2">
+    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50 bg-white/95 dark:bg-gray-950/95 border border-slate-200 dark:border-gray-800/90 rounded-2xl p-4 shadow-xl dark:shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-2 transition-colors duration-200">
       <div className="flex items-start gap-3">
-        <div className="w-8 h-8 rounded-lg bg-violet-600/20 border border-violet-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-          <ShieldCheck className="w-4 h-4 text-violet-400" />
+        <div className="w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-600/20 border border-violet-200 dark:border-violet-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+          <ShieldCheck className="w-4 h-4 text-violet-600 dark:text-violet-400" />
         </div>
-        <div className="flex-1 min-w-0 text-xs text-gray-300 leading-relaxed">
+        <div className="flex-1 min-w-0 text-xs text-slate-700 dark:text-gray-300 leading-relaxed">
           <p>
             We use local storage and privacy-friendly cookies to enhance your download experience and remember your preferences. No personal information is sold.
           </p>
@@ -56,13 +56,13 @@ export default function CookieConsent() {
             <button
               type="button"
               onClick={handleAccept}
-              className="px-4 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white font-semibold transition-colors"
+              className="px-4 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white font-semibold transition-colors shadow-sm"
             >
               Got it
             </button>
             <Link
-              href="/faq"
-              className="text-gray-400 hover:text-white underline transition-colors"
+              href="/how-it-works"
+              className="text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white underline transition-colors"
             >
               Learn more
             </Link>
@@ -71,7 +71,7 @@ export default function CookieConsent() {
         <button
           type="button"
           onClick={handleDismiss}
-          className="text-gray-500 hover:text-gray-300 p-1 -mr-1 -mt-1 transition-colors"
+          className="text-slate-400 hover:text-slate-600 dark:text-gray-500 dark:hover:text-gray-300 p-1 -mr-1 -mt-1 transition-colors"
           aria-label="Dismiss cookie notice"
         >
           <X className="w-4 h-4" />

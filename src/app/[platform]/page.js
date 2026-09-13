@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { notFound } from "next/navigation";
 import { PLATFORMS } from "@/lib/constants";
@@ -58,9 +58,9 @@ function PlatformPageContent({ platform }) {
 
   const IconComponent = iconMap[platform.icon] || Video;
 
-  const handleDownload = (url) => {
+  const handleDownload = useCallback((url) => {
     fetchInfo(url, platform.slug);
-  };
+  }, [fetchInfo, platform.slug]);
 
   // Auto-fill URL from query param
   useEffect(() => {
@@ -68,7 +68,7 @@ function PlatformPageContent({ platform }) {
     if (urlParam) {
       handleDownload(urlParam);
     }
-  }, [searchParams]);
+  }, [searchParams, handleDownload]);
 
   const platformFaqs = [
     {
@@ -92,7 +92,7 @@ function PlatformPageContent({ platform }) {
   return (
     <>
       {/* Platform Hero */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden transition-colors duration-200">
         <div
           className={`absolute inset-0 bg-gradient-to-b ${platform.gradient} opacity-5`}
         />
@@ -106,12 +106,12 @@ function PlatformPageContent({ platform }) {
             <IconComponent className="w-8 h-8 text-white" />
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-4">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white mb-4 transition-colors">
             {platform.name}{" "}
             <span className="gradient-text">Video Downloader</span>
           </h1>
 
-          <p className="text-lg text-gray-400 mb-10 max-w-2xl mx-auto">
+          <p className="text-lg text-slate-600 dark:text-gray-400 mb-10 max-w-2xl mx-auto transition-colors">
             {platform.description}
           </p>
 
@@ -126,7 +126,7 @@ function PlatformPageContent({ platform }) {
           {isLoading && <LoadingSpinner text="Fetching video info..." />}
           {error && (
             <div className="mt-6 max-w-2xl mx-auto">
-              <ErrorMessage message={error} onRetry={() => setError("")} />
+              <ErrorMessage message={error} onRetry={reset} />
             </div>
           )}
           {result && (
@@ -145,14 +145,14 @@ function PlatformPageContent({ platform }) {
       </section>
 
       {/* Features Strip */}
-      <section className="py-12 bg-gray-900/30 border-y border-gray-800/30">
+      <section className="py-12 bg-slate-100/80 dark:bg-gray-900/30 border-y border-slate-200 dark:border-gray-800/30 transition-colors duration-200">
         <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {platform.features.map((feature) => (
             <div key={feature} className="flex flex-col items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-violet-600/10 border border-violet-500/20 flex items-center justify-center">
-                <Download className="w-4 h-4 text-violet-400" />
+              <div className="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-600/10 border border-violet-200 dark:border-violet-500/20 flex items-center justify-center">
+                <Download className="w-4 h-4 text-violet-600 dark:text-violet-400" />
               </div>
-              <span className="text-white text-sm font-medium">{feature}</span>
+              <span className="text-slate-900 dark:text-white text-sm font-medium transition-colors">{feature}</span>
             </div>
           ))}
         </div>
@@ -161,7 +161,7 @@ function PlatformPageContent({ platform }) {
       {/* How to Use */}
       <section className="py-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-white text-center mb-10">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-10 transition-colors">
             How to Download {platform.name} Videos
           </h2>
           <div className="space-y-6">
@@ -187,14 +187,14 @@ function PlatformPageContent({ platform }) {
             ].map((item) => (
               <div
                 key={item.step}
-                className="flex gap-4 items-start bg-gray-900/50 border border-gray-800/50 rounded-xl p-5"
+                className="flex gap-4 items-start bg-white dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800/50 rounded-xl p-5 shadow-sm transition-colors"
               >
                 <span className="text-2xl">{item.icon}</span>
                 <div>
-                  <h3 className="text-white font-semibold mb-1">
+                  <h3 className="text-slate-900 dark:text-white font-semibold mb-1 transition-colors">
                     Step {item.step}: {item.title}
                   </h3>
-                  <p className="text-gray-400 text-sm">{item.desc}</p>
+                  <p className="text-slate-600 dark:text-gray-400 text-sm transition-colors">{item.desc}</p>
                 </div>
               </div>
             ))}

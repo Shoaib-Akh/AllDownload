@@ -37,13 +37,13 @@ export default function DownloadInput({ onSubmit, isLoading = false, platform = 
             onChange={(e) => { setUrl(e.target.value); setError(''); }}
             placeholder={platform ? `Paste ${platform.name} video URL here...` : 'Paste video URL here...'}
             disabled={isLoading}
-            className="w-full px-5 py-4 bg-gray-800/80 border border-gray-700/50 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 text-base transition-all disabled:opacity-50"
+            className="w-full px-5 py-4 bg-white dark:bg-gray-800/80 border border-slate-200 dark:border-gray-700/50 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 text-base shadow-sm transition-all disabled:opacity-50"
           />
           <button
             type="button"
             onClick={handlePaste}
             disabled={isLoading}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-violet-400 transition-colors disabled:opacity-50"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-violet-600 dark:text-gray-400 dark:hover:text-violet-400 transition-colors disabled:opacity-50"
             title="Paste from clipboard"
           >
             <ClipboardPaste className="w-5 h-5" />
@@ -62,7 +62,7 @@ export default function DownloadInput({ onSubmit, isLoading = false, platform = 
         </button>
       </div>
       {error && (
-        <p className="text-red-400 text-sm mt-3">{error}</p>
+        <p className="text-rose-500 dark:text-red-400 text-sm mt-3">{error}</p>
       )}
     </form>
   );

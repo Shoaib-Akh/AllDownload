@@ -140,20 +140,23 @@ export const PLATFORMS = [
 export const HOW_IT_WORKS_STEPS = [
   {
     step: 1,
-    title: 'Paste the URL',
-    description: 'Copy the video URL from any supported platform and paste it in the input field above.',
+    title: 'Copy the Link',
+    description: 'Open the post, tap the share icon and select “Copy Link.” On desktop, just copy the URL from the address bar.',
+    bar: 'Works for public posts only',
     icon: 'clipboard-paste',
   },
   {
     step: 2,
-    title: 'Fetch Media Info',
-    description: 'Click the download button and we will fetch the video details including quality options.',
+    title: 'Paste Into Savefrompro',
+    description: 'Come back here and paste the link into the field above. Tap Paste or hit Ctrl+V on desktop. The link fills in instantly — no typing needed.',
+    bar: 'No account or login required',
     icon: 'search',
   },
   {
     step: 3,
-    title: 'Download & Enjoy',
-    description: 'Select your preferred quality and download the video to your device. It is that simple!',
+    title: 'Choose Quality & Save',
+    description: 'Pick HD or SD, hit Download. Your file saves straight to your camera roll or Downloads folder — no watermark, no fuss.',
+    bar: 'Also save as MP3 audio',
     icon: 'download',
   },
 ];
@@ -193,27 +196,58 @@ export const FEATURES = [
 
 export const GLOBAL_FAQS = [
   {
-    question: 'Is SaveFromPro really free?',
-    answer: 'Yes! SaveFromPro is 100% free to use. There are no hidden charges, no premium plans, and no limits on downloads.',
+    question: 'Is SaveFromPro free to use?',
+    answer:
+      "Yes. Pasting a link and saving a file doesn't require payment or a subscription on any of the twelve supported platforms.",
   },
   {
-    question: 'Do I need to install any software?',
-    answer: 'No! SaveFromPro works entirely in your browser. No app, extension, or software installation is required.',
+    question: 'Do I need to install an app?',
+    answer:
+      "No. SaveFromPro runs entirely in your browser, on both mobile and desktop, so there's nothing to install and nothing to update.",
   },
   {
-    question: 'Is it safe to use SaveFromPro?',
-    answer: 'Absolutely. We do not store any personal data or downloaded files. Your privacy is our priority.',
+    question: 'Can I download from a private account?',
+    answer:
+      "No. If a post isn't visible to the public, SaveFromPro can't fetch it. This is intentional — it keeps the tool aligned with what people have already chosen to share publicly.",
   },
   {
-    question: 'What video quality can I download?',
-    answer: 'We offer the highest quality available from the source — including HD (720p), Full HD (1080p), and sometimes 4K depending on the platform.',
+    question: 'Will the download have a watermark on it?',
+    answer:
+      "SaveFromPro doesn't add its own watermark. Whether the original file already includes one depends on the platform and the creator's settings.",
   },
   {
-    question: 'Which platforms are supported?',
-    answer: 'We support Facebook, Instagram, TikTok, Twitter/X, Snapchat, Twitch, Dailymotion, Vimeo, Reddit, Threads, LinkedIn, and Pinterest.',
+    question: 'Which file format do I get?',
+    answer:
+      'Video typically saves as MP4 and photos as JPG or PNG — standard formats that play on virtually any phone, tablet or computer.',
   },
   {
-    question: 'Can I download videos on my phone?',
-    answer: 'Yes! SaveFromPro works on all devices including Android, iPhone, iPad, and desktop browsers.',
+    question: 'Is it safe to paste a link from any of these platforms?',
+    answer:
+      "SaveFromPro only reads the public link you paste to locate the media file; it doesn't ask for your username, password, or platform login at any point.",
+  },
+  {
+    question: 'Why do I need a separate page for each platform?',
+    answer:
+      "Each platform structures its share links and media files differently, so a page tuned to one platform's link format gives more reliable results than a single one-size-fits-all box.",
+  },
+  {
+    question: 'Can I use SaveFromPro on my phone?',
+    answer:
+      "Yes — open the site in your phone's browser, paste the link from the share sheet, and save the file to your camera roll or downloads folder.",
+  },
+  {
+    question: 'Does SaveFromPro work the same way on every platform?',
+    answer:
+      "The paste-and-fetch idea is the same everywhere, but each platform's dedicated page is tuned to that platform's link format and content types, which gives more reliable results than one generic box.",
+  },
+  {
+    question: 'What happens to a link after I paste it?',
+    answer:
+      "It's used only to locate and prepare the file for you to save — SaveFromPro doesn't keep a history of links or files once your download is complete.",
+  },
+  {
+    question: "What if a platform I use isn't listed here?",
+    answer:
+      "The twelve platforms above cover the majority of everyday video and photo sharing. If a link from one of them doesn't resolve, double-check that the specific post is public before assuming the tool doesn't support it.",
   },
 ];
