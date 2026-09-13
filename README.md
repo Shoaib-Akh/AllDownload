@@ -80,3 +80,4 @@ npm run pages:deploy
 
 ## 🛡️ License & Disclaimer
 This tool is for personal and educational use. Please respect copyright laws and the terms of service of each respective platform.
+# AllDownload
