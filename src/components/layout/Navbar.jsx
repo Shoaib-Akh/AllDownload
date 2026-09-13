@@ -1,0 +1,61 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { Download, Menu, X } from 'lucide-react';
+import MobileMenu from './MobileMenu';
+import ThemeToggle from '../common/ThemeToggle';
+
+export default function Navbar() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <nav className="sticky top-0 z-50 bg-gray-950/80 backdrop-blur-xl border-b border-gray-800/50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-9 h-9 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Download className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold text-white">
+              SaveFrom<span className="text-violet-400">Pro</span>
+            </span>
+          </Link>
+
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-8">
+            <Link href="/" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">
+              Home
+            </Link>
+            <Link href="/#platforms" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">
+              Platforms
+            </Link>
+            <Link href="/how-it-works" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">
+              How It Works
+            </Link>
+            <Link href="/faq" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">
+              FAQ
+            </Link>
+            <ThemeToggle />
+          </div>
+
+          {/* Right Mobile Actions */}
+          <div className="flex md:hidden items-center gap-2">
+            <ThemeToggle />
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 text-gray-300 hover:text-white transition-colors"
+              aria-label="Toggle navigation menu"
+            >
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      <MobileMenu isOpen={isOpen} onClose={() => setIsOpen(false)} />
+    </nav>
+  );
+}

@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# SaveFromPro 🚀
+> Premium, Lightning-Fast Video Downloader built for Cloudflare Edge & Next.js
 
-## Getting Started
+SaveFromPro is a modern, high-performance online video downloader supporting **12 major social media & video platforms**. Built with Next.js 14 App Router, Tailwind CSS, Edge Runtime, and optimized specifically for deployment on **Cloudflare Pages** and **Cloudflare D1**.
 
-First, run the development server:
+---
 
+## 🌟 Supported Platforms (12 Total)
+1. **Facebook** (`/facebook`) - HD/SD Videos, Reels & Stories
+2. **Instagram** (`/instagram`) - Reels, Posts, Stories & IGTV
+3. **TikTok** (`/tiktok`) - Watermark-Free HD Videos & MP3 Audio
+4. **Twitter / X** (`/twitter`) - Multi-resolution MP4 Videos & GIFs
+5. **Snapchat** (`/snapchat`) - Spotlight & Public Story Videos
+6. **Twitch** (`/twitch`) - Clips & High-Quality VODs
+7. **Dailymotion** (`/dailymotion`) - 1080p, 720p, 480p Progressive MP4s
+8. **Vimeo** (`/vimeo`) - HD, Full HD & 4K Streams
+9. **Reddit** (`/reddit`) - Videos with Audio stream merge
+10. **Threads** (`/threads`) - Videos and High-Res Images
+11. **LinkedIn** (`/linkedin`) - Professional Posts & Video clips
+12. **Pinterest** (`/pinterest`) - High-Res Pins & Videos
+
+---
+
+## ⚡ Tech Stack & Architecture
+- **Framework**: Next.js 14 (App Router, Edge Runtime)
+- **Styling**: Tailwind CSS + Custom Animations & Dark Glassmorphism Theme
+- **Hosting**: [Cloudflare Pages](https://dash.cloudflare.com) (via `@cloudflare/next-on-pages`)
+- **Database**: [Cloudflare D1](https://developers.cloudflare.com/d1/) (Serverless distributed SQL)
+- **ORM & Migrations**: Drizzle ORM + raw SQL migrations
+- **Icons**: Lucide Icons + Custom SVG Brand Icons
+- **SEO**: Dynamic Sitemap (`/sitemap.xml`), Robots (`/robots.txt`), OpenGraph, JSON-LD Schema (WebApplication & FAQPage)
+- **Testing**: Native Node.js Test Runner (38 automated unit & integration tests)
+
+---
+
+## 🚀 Getting Started
+
+### 1. Install Dependencies
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Run Local Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### 3. Run Automated Tests
+```bash
+npm test
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### 4. Build for Cloudflare Pages
+```bash
+npm run pages:build
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 📖 Deployment Guide
+Full deployment documentation is available in [DEPLOYMENT.md](./DEPLOYMENT.md).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Quick Deploy to Cloudflare Pages:
+```bash
+# Authenticate
+npx wrangler login
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+# Create D1 database
+npx wrangler d1 create savefrompro-db
 
-## Deploy on Vercel
+# Run database migrations
+npm run d1:migrate:remote
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Build & Deploy
+npm run pages:deploy
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+---
+
+## 🛡️ License & Disclaimer
+This tool is for personal and educational use. Please respect copyright laws and the terms of service of each respective platform.
