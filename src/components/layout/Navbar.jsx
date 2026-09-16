@@ -1,13 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Download, Menu, X } from 'lucide-react';
+import { Download, Menu, X, Shield, PlusCircle, Users } from 'lucide-react';
 import MobileMenu from './MobileMenu';
 import ThemeToggle from '../common/ThemeToggle';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState(1);
+
+  useEffect(() => {
+    // Fetch live users
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch('/api/users');
+        const json = await res.json();
+        if (json.success && typeof json.activeNow === 'number') {
+          setOnlineUsers(json.activeNow);
+        }
+      } catch (e) {
+        // quiet fallback
+      }
+    };
+
+    fetchUsers();
+    const timer = setInterval(fetchUsers, 30000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-b border-slate-200/80 dark:border-gray-800/50 transition-colors duration-200">
@@ -24,7 +44,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             <Link href="/" className="text-slate-600 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors text-sm font-medium">
               Home
             </Link>
@@ -37,11 +57,43 @@ export default function Navbar() {
             <Link href="/blog" className="text-slate-600 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors text-sm font-medium">
               Blog
             </Link>
+
+            {/* Write Blog button */}
+            <Link
+              href="/blog/create"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-slate-700 dark:text-gray-200 text-xs font-semibold transition-colors"
+            >
+              <PlusCircle className="w-3.5 h-3.5 text-violet-500" />
+              <span>Write Blog</span>
+            </Link>
+
+            {/* Admin link */}
+            <Link
+              href="/admin"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/30 dark:hover:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800 text-xs font-semibold transition-colors"
+            >
+              <Shield className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
+              <span>Admin</span>
+            </Link>
+
+            {/* Live Online Users Counter */}
+            <div
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-300 text-xs font-medium"
+              title="Active online users currently using SaveFromPro"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>{onlineUsers} Online</span>
+            </div>
+
             <ThemeToggle />
           </div>
 
           {/* Right Mobile Actions */}
           <div className="flex md:hidden items-center gap-2">
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 text-[11px] font-medium mr-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>{onlineUsers}</span>
+            </div>
             <ThemeToggle />
             <button
               onClick={() => setIsOpen(!isOpen)}

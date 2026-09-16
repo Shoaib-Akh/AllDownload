@@ -293,18 +293,26 @@ export const BLOG_POSTS = [
   }
 ];
 
+import { store } from "../db/store.js";
+
 export function getAllBlogPosts() {
-  return BLOG_POSTS;
+  const custom = store ? store.getAllCustomBlogs() : [];
+  return [...custom, ...BLOG_POSTS];
 }
 
 export function getBlogPostBySlug(slug) {
+  if (store) {
+    const custom = store.getCustomBlogBySlug(slug);
+    if (custom) return custom;
+  }
   return BLOG_POSTS.find((post) => post.slug === slug);
 }
 
 export function getFeaturedBlogPost() {
-  return BLOG_POSTS.find((post) => post.featured) || BLOG_POSTS[0];
+  const all = getAllBlogPosts();
+  return all.find((post) => post.featured) || all[0];
 }
 
 export function getRecentBlogPosts(limit = 3) {
-  return BLOG_POSTS.slice(0, limit);
+  return getAllBlogPosts().slice(0, limit);
 }

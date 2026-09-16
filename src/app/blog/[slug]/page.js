@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 
+export const dynamicParams = true;
+
 export function generateStaticParams() {
   const posts = getAllBlogPosts();
   return posts.map((post) => ({
@@ -228,6 +230,29 @@ export default function BlogPostPage({ params }) {
 
             return null;
           })}
+
+          {/* Custom User/Admin CSS & HTML Rendering */}
+          {post.custom_css && (
+            <style dangerouslySetInnerHTML={{ __html: post.custom_css }} />
+          )}
+
+          {post.custom_html && (
+            <div className="my-8 p-6 rounded-2xl border border-violet-200 dark:border-violet-900/40 bg-violet-50/30 dark:bg-violet-950/10 shadow-sm">
+              <div className="flex items-center justify-between pb-3 mb-4 border-b border-violet-100 dark:border-violet-900/30 text-xs font-semibold text-violet-700 dark:text-violet-400">
+                <span className="flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Custom HTML Component
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 text-[10px] font-mono">
+                  Styled with Custom CSS
+                </span>
+              </div>
+              <div
+                className="custom-blog-rendered-content"
+                dangerouslySetInnerHTML={{ __html: post.custom_html }}
+              />
+            </div>
+          )}
         </div>
 
         {/* Action / Try Downloader Box */}
