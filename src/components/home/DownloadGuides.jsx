@@ -32,7 +32,7 @@ const guides = [
   },
   {
     title: 'Is it legal?',
-    href: '/blog/why-savefrompro-is-safest-downloader',
+    href: '/is-it-legal',
     icon: ShieldCheck,
   },
   {

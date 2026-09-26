@@ -62,8 +62,8 @@ export default function Footer() {
               <li><Link href="/platforms" className="text-slate-600 hover:text-violet-600 dark:text-gray-400 dark:hover:text-violet-400 transition-colors text-sm">Supported Platforms</Link></li>
               <li><Link href="/how-it-works" className="text-slate-600 hover:text-violet-600 dark:text-gray-400 dark:hover:text-violet-400 transition-colors text-sm">How It Works</Link></li>
               <li><Link href="/blog" className="text-slate-600 hover:text-violet-600 dark:text-gray-400 dark:hover:text-violet-400 transition-colors text-sm">Blog</Link></li>
-              <li><Link href="/" className="text-slate-600 hover:text-violet-600 dark:text-gray-400 dark:hover:text-violet-400 transition-colors text-sm">Privacy Policy</Link></li>
-              <li><Link href="/" className="text-slate-600 hover:text-violet-600 dark:text-gray-400 dark:hover:text-violet-400 transition-colors text-sm">Terms of Service</Link></li>
+              <li><Link href="/privacy" className="text-slate-600 hover:text-violet-600 dark:text-gray-400 dark:hover:text-violet-400 transition-colors text-sm">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="text-slate-600 hover:text-violet-600 dark:text-gray-400 dark:hover:text-violet-400 transition-colors text-sm">Terms of Service</Link></li>
             </ul>
           </div>
         </div>
