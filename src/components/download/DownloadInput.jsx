@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Download, ClipboardPaste, Loader2 } from 'lucide-react';
 
-export default function DownloadInput({ onSubmit, isLoading = false, platform = null }) {
+export default function DownloadInput({ onSubmit, isLoading = false, platform = null, buttonText = "Download" }) {
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
 
@@ -57,7 +57,7 @@ export default function DownloadInput({ onSubmit, isLoading = false, platform = 
           {isLoading ? (
             <><Loader2 className="w-5 h-5 animate-spin" /> Fetching...</>
           ) : (
-            <><Download className="w-5 h-5" /> Download</>
+            <><Download className="w-5 h-5" /> {buttonText}</>
           )}
         </button>
       </div>

@@ -11,6 +11,15 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import FAQ from "@/components/common/FAQ";
 import { useDownload } from "@/hooks/useDownload";
 import RecentDownloads from "@/components/home/RecentDownloads";
+import InstagramPlatformView from "@/components/platform/InstagramPlatformView";
+import TikTokPlatformView from "@/components/platform/TikTokPlatformView";
+import TwitterPlatformView from "@/components/platform/TwitterPlatformView";
+import SnapchatPlatformView from "@/components/platform/SnapchatPlatformView";
+import TwitchPlatformView from "@/components/platform/TwitchPlatformView";
+import DailymotionPlatformView from "@/components/platform/DailymotionPlatformView";
+import RedditPlatformView from "@/components/platform/RedditPlatformView";
+import LinkedInPlatformView from "@/components/platform/LinkedInPlatformView";
+import PinterestPlatformView from "@/components/platform/PinterestPlatformView";
 import {
   Video,
   Music,
@@ -88,6 +97,159 @@ function PlatformPageContent({ platform }) {
       answer: `Absolutely! SaveFromPro works on all devices — Android, iPhone, iPad, and desktop browsers. No app installation needed.`,
     },
   ];
+
+  if (platform.slug === "instagram") {
+    return (
+      <InstagramPlatformView
+        platform={platform}
+        handleDownload={handleDownload}
+        isLoading={isLoading}
+        error={error}
+        reset={reset}
+        result={result}
+        triggerDownload={triggerDownload}
+        recents={recents}
+        clearRecents={clearRecents}
+        removeRecent={removeRecent}
+      />
+    );
+  }
+
+  if (platform.slug === "tiktok") {
+    return (
+      <TikTokPlatformView
+        platform={platform}
+        handleDownload={handleDownload}
+        isLoading={isLoading}
+        error={error}
+        reset={reset}
+        result={result}
+        triggerDownload={triggerDownload}
+        recents={recents}
+        clearRecents={clearRecents}
+        removeRecent={removeRecent}
+      />
+    );
+  }
+
+  if (platform.slug === "twitter") {
+    return (
+      <TwitterPlatformView
+        platform={platform}
+        handleDownload={handleDownload}
+        isLoading={isLoading}
+        error={error}
+        reset={reset}
+        result={result}
+        triggerDownload={triggerDownload}
+        recents={recents}
+        clearRecents={clearRecents}
+        removeRecent={removeRecent}
+      />
+    );
+  }
+
+  if (platform.slug === "snapchat") {
+    return (
+      <SnapchatPlatformView
+        platform={platform}
+        handleDownload={handleDownload}
+        isLoading={isLoading}
+        error={error}
+        reset={reset}
+        result={result}
+        triggerDownload={triggerDownload}
+        recents={recents}
+        clearRecents={clearRecents}
+        removeRecent={removeRecent}
+      />
+    );
+  }
+
+  if (platform.slug === "twitch") {
+    return (
+      <TwitchPlatformView
+        platform={platform}
+        handleDownload={handleDownload}
+        isLoading={isLoading}
+        error={error}
+        reset={reset}
+        result={result}
+        triggerDownload={triggerDownload}
+        recents={recents}
+        clearRecents={clearRecents}
+        removeRecent={removeRecent}
+      />
+    );
+  }
+
+  if (platform.slug === "dailymotion") {
+    return (
+      <DailymotionPlatformView
+        platform={platform}
+        handleDownload={handleDownload}
+        isLoading={isLoading}
+        error={error}
+        reset={reset}
+        result={result}
+        triggerDownload={triggerDownload}
+        recents={recents}
+        clearRecents={clearRecents}
+        removeRecent={removeRecent}
+      />
+    );
+  }
+
+  if (platform.slug === "reddit") {
+    return (
+      <RedditPlatformView
+        platform={platform}
+        handleDownload={handleDownload}
+        isLoading={isLoading}
+        error={error}
+        reset={reset}
+        result={result}
+        triggerDownload={triggerDownload}
+        recents={recents}
+        clearRecents={clearRecents}
+        removeRecent={removeRecent}
+      />
+    );
+  }
+
+  if (platform.slug === "linkedin") {
+    return (
+      <LinkedInPlatformView
+        platform={platform}
+        handleDownload={handleDownload}
+        isLoading={isLoading}
+        error={error}
+        reset={reset}
+        result={result}
+        triggerDownload={triggerDownload}
+        recents={recents}
+        clearRecents={clearRecents}
+        removeRecent={removeRecent}
+      />
+    );
+  }
+
+  if (platform.slug === "pinterest") {
+    return (
+      <PinterestPlatformView
+        platform={platform}
+        handleDownload={handleDownload}
+        isLoading={isLoading}
+        error={error}
+        reset={reset}
+        result={result}
+        triggerDownload={triggerDownload}
+        recents={recents}
+        clearRecents={clearRecents}
+        removeRecent={removeRecent}
+      />
+    );
+  }
 
   return (
     <>
