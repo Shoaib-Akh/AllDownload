@@ -54,6 +54,9 @@ export default function Navbar() {
             <Link href="/how-it-works" className="text-slate-600 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors text-sm font-medium">
               How It Works
             </Link>
+            <Link href="/is-it-legal" className="text-slate-600 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors text-sm font-medium">
+              Is It Legal?
+            </Link>
             <Link href="/blog" className="text-slate-600 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors text-sm font-medium">
               Blog
             </Link>

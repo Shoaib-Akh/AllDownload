@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Home, LayoutGrid, BookOpen, Info } from 'lucide-react';
+import { Home, LayoutGrid, BookOpen, Info, Scale } from 'lucide-react';
 
 export default function MobileMenu({ isOpen, onClose }) {
   if (!isOpen) return null;
@@ -10,6 +10,7 @@ export default function MobileMenu({ isOpen, onClose }) {
     { href: '/', label: 'Home', icon: Home },
     { href: '/platforms', label: 'Platforms', icon: LayoutGrid },
     { href: '/how-it-works', label: 'How It Works', icon: Info },
+    { href: '/is-it-legal', label: 'Is It Legal?', icon: Scale },
     { href: '/blog', label: 'Blog', icon: BookOpen },
   ];
 
