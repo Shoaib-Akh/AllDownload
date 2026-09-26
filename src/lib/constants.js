@@ -140,7 +140,7 @@ export const PLATFORMS = [
 export const HOW_IT_WORKS_STEPS = [
   {
     step: 1,
-    title: 'Copy the Link',
+    title: 'Copy the Snap Link',
     description: 'Open the post, tap the share icon and select “Copy Link.” On desktop, just copy the URL from the address bar.',
     bar: 'Works for public posts only',
     icon: 'clipboard-paste',

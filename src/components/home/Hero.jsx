@@ -159,20 +159,6 @@ export default function Hero() {
 
         {/* Supported platforms tags & trust indicators */}
         <div className="mt-8 space-y-4">
-          <div className="inline-flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 py-2.5 rounded-xl bg-white/80 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800/80 text-slate-700 dark:text-gray-300 text-xs sm:text-sm shadow-sm backdrop-blur-sm transition-colors">
-            <span>✓ No login required</span>
-            <span className="hidden sm:inline text-slate-300 dark:text-gray-700">•</span>
-            <span>✓ No watermark added</span>
-            <span className="hidden sm:inline text-slate-300 dark:text-gray-700">•</span>
-            <span>✓ Nothing stored on our servers</span>
-            <span className="hidden sm:inline text-slate-300 dark:text-gray-700">•</span>
-            <span>✓ Works on mobile &amp; desktop</span>
-          </div>
-
-          <p className="text-slate-600 dark:text-gray-400 text-xs sm:text-sm max-w-2xl mx-auto leading-relaxed transition-colors">
-            Platforms we supported Instagram, TikTok, Facebook, Twitter/X, Snapchat, Twitch, Dailymotion, Vimeo, Reddit, Threads, LinkedIn and Pinterest.
-          </p>
-
           <p className="text-slate-500 dark:text-gray-500 text-xs">
             By using our service you accept our{" "}
             <Link href="/terms" className="text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors underline underline-offset-2">
@@ -183,6 +169,20 @@ export default function Hero() {
               Privacy Policy
             </Link>
           </p>
+
+          <p className="text-slate-600 dark:text-gray-400 text-xs sm:text-sm max-w-2xl mx-auto leading-relaxed transition-colors">
+            Platforms we supported Instagram, TikTok, Facebook, Twitter/X, Snapchat, Twitch, Dailymotion, Vimeo, Reddit, Threads, LinkedIn and Pinterest.
+          </p>
+
+          <div className="inline-flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 py-2.5 rounded-xl bg-white/80 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800/80 text-slate-700 dark:text-gray-300 text-xs sm:text-sm shadow-sm backdrop-blur-sm transition-colors">
+            <span>✓ No login required</span>
+            <span className="hidden sm:inline text-slate-300 dark:text-gray-700">•</span>
+            <span>✓ No watermark added</span>
+            <span className="hidden sm:inline text-slate-300 dark:text-gray-700">•</span>
+            <span>✓ Nothing stored on our servers</span>
+            <span className="hidden sm:inline text-slate-300 dark:text-gray-700">•</span>
+            <span>✓ Works on mobile &amp; desktop</span>
+          </div>
         </div>
 
         {/* How to Download Section */}

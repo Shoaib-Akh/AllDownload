@@ -38,13 +38,13 @@ export default function HowToDownlod() {
       <div className="text-center mb-10">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-100 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 text-violet-700 dark:text-violet-300 text-xs font-semibold uppercase tracking-wider mb-3 transition-colors">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>Simple 3-Step Process</span>
+          <span>3 Easy Steps</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight transition-colors">
           How to <span className="gradient-text">Download</span>
         </h2>
         <p className="text-slate-600 dark:text-gray-400 text-sm sm:text-base mt-2 max-w-xl mx-auto transition-colors">
-          Download any video in just 3 simple steps. No signup required.
+          No technical skills needed. Download any video in under 30 seconds.
         </p>
       </div>
 

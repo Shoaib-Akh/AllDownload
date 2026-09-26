@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Download, Menu, X, Shield, PlusCircle, Users } from 'lucide-react';
+import { Download, Menu, X } from 'lucide-react';
 import MobileMenu from './MobileMenu';
 import ThemeToggle from '../common/ThemeToggle';
 
@@ -56,24 +56,6 @@ export default function Navbar() {
             </Link>
             <Link href="/blog" className="text-slate-600 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors text-sm font-medium">
               Blog
-            </Link>
-
-            {/* Write Blog button */}
-            <Link
-              href="/blog/create"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-slate-700 dark:text-gray-200 text-xs font-semibold transition-colors"
-            >
-              <PlusCircle className="w-3.5 h-3.5 text-violet-500" />
-              <span>Write Blog</span>
-            </Link>
-
-            {/* Admin link */}
-            <Link
-              href="/admin"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/30 dark:hover:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800 text-xs font-semibold transition-colors"
-            >
-              <Shield className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
-              <span>Admin</span>
             </Link>
 
             {/* Live Online Users Counter */}

@@ -41,7 +41,7 @@ export default function TrustDisclaimers() {
               Platform Disclaimer
             </h3>
             <p className="text-slate-600 dark:text-gray-400 text-xs sm:text-sm leading-relaxed transition-colors">
-              Savefrompro is an independent tool and is not affiliated with any third-party social media platform. All trademarks belong to their respective owners.
+              Savefrompro is not affiliated with any platform or Snapchat. All trademarks belong to their respective owners.
             </p>
           </div>
         </div>
