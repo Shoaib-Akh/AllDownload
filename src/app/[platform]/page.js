@@ -11,6 +11,7 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import FAQ from "@/components/common/FAQ";
 import { useDownload } from "@/hooks/useDownload";
 import RecentDownloads from "@/components/home/RecentDownloads";
+import FacebookPlatformView from "@/components/platform/FacebookPlatformView";
 import InstagramPlatformView from "@/components/platform/InstagramPlatformView";
 import TikTokPlatformView from "@/components/platform/TikTokPlatformView";
 import TwitterPlatformView from "@/components/platform/TwitterPlatformView";
@@ -20,6 +21,8 @@ import DailymotionPlatformView from "@/components/platform/DailymotionPlatformVi
 import RedditPlatformView from "@/components/platform/RedditPlatformView";
 import LinkedInPlatformView from "@/components/platform/LinkedInPlatformView";
 import PinterestPlatformView from "@/components/platform/PinterestPlatformView";
+import VimeoPlatformView from "@/components/platform/VimeoPlatformView";
+import ThreadsPlatformView from "@/components/platform/ThreadsPlatformView";
 import {
   Video,
   Music,
@@ -97,6 +100,23 @@ function PlatformPageContent({ platform }) {
       answer: `Absolutely! SaveFromPro works on all devices — Android, iPhone, iPad, and desktop browsers. No app installation needed.`,
     },
   ];
+
+  if (platform.slug === "facebook") {
+    return (
+      <FacebookPlatformView
+        platform={platform}
+        handleDownload={handleDownload}
+        isLoading={isLoading}
+        error={error}
+        reset={reset}
+        result={result}
+        triggerDownload={triggerDownload}
+        recents={recents}
+        clearRecents={clearRecents}
+        removeRecent={removeRecent}
+      />
+    );
+  }
 
   if (platform.slug === "instagram") {
     return (
@@ -237,6 +257,40 @@ function PlatformPageContent({ platform }) {
   if (platform.slug === "pinterest") {
     return (
       <PinterestPlatformView
+        platform={platform}
+        handleDownload={handleDownload}
+        isLoading={isLoading}
+        error={error}
+        reset={reset}
+        result={result}
+        triggerDownload={triggerDownload}
+        recents={recents}
+        clearRecents={clearRecents}
+        removeRecent={removeRecent}
+      />
+    );
+  }
+
+  if (platform.slug === "vimeo") {
+    return (
+      <VimeoPlatformView
+        platform={platform}
+        handleDownload={handleDownload}
+        isLoading={isLoading}
+        error={error}
+        reset={reset}
+        result={result}
+        triggerDownload={triggerDownload}
+        recents={recents}
+        clearRecents={clearRecents}
+        removeRecent={removeRecent}
+      />
+    );
+  }
+
+  if (platform.slug === "threads") {
+    return (
+      <ThreadsPlatformView
         platform={platform}
         handleDownload={handleDownload}
         isLoading={isLoading}
