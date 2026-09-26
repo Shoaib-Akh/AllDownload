@@ -11,6 +11,6 @@ export const metadata = {
   },
 };
 
-export default function HowItWorksPage() {
+export default function HowToDownloadPage() {
   return <HowToDownloadGuide />;
 }
