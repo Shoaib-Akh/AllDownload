@@ -9,9 +9,9 @@
     "lint": "next lint",
     "test": "node --test tests/*.test.js --exclude tests/live-download.test.js",
     "test:live": "LIVE_DOWNLOAD=1 node --test tests/live-download.test.js",
-    "pages:build": "npx @cloudflare/next-on-pages",
+    "pages:build": "npx @cloudflare/next-on-pages && node scripts/fix-cf-build.js",
     "pages:preview": "npm run pages:build && wrangler pages dev",
-    "pages:deploy": "npm run pages:build && wrangler pages deploy .vercel/output/static",
+    "pages:deploy": "npm run pages:build && wrangler pages deploy .vercel/output/static --project-name=alldownload",
     "d1:migrate:local": "wrangler d1 execute savefrompro-db --local --file=./drizzle/0001_create_tables.sql",
     "d1:migrate:remote": "wrangler d1 execute savefrompro-db --remote --file=./drizzle/0001_create_tables.sql"
   },

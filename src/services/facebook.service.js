@@ -13,49 +13,81 @@ import {
  */
 export async function extractFacebookVideo(url) {
   try {
-    const reelMatch = url.match(/(?:reel|videos|watch\/?[\?&]v=)(\d+)/i);
-    const videoId = reelMatch ? reelMatch[1] : null;
+    let targetUrl = url.trim();
 
-    // Standardize URL candidates to try
-    const cleanUrl = url.replace(/m\.facebook\.com/, "www.facebook.com");
-    const urlsToTry = [cleanUrl];
-    if (videoId && url.includes("/reel/")) {
-      urlsToTry.push(`https://www.facebook.com/watch/?v=${videoId}`);
-      urlsToTry.push(`https://mbasic.facebook.com/video/video.php?v=${videoId}`);
+    // 1. Resolve Facebook share links (e.g. /share/r/ or /share/v/) to canonical URL
+    if (targetUrl.includes("/share/")) {
+      try {
+        const redirectRes = await fetchWithTimeout(targetUrl, {
+          method: "GET",
+          headers: {
+            "User-Agent": "facebookexternalhit/1.1",
+            Accept: "*/*",
+          },
+          redirect: "manual",
+        });
+        const loc = redirectRes.headers.get("location");
+        if (loc) {
+          targetUrl = loc;
+        }
+      } catch {
+        // Continue with original url if redirect check fails
+      }
     }
 
-    const headers = {
-      "User-Agent": DEFAULT_USER_AGENT,
-      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    // 2. Extract numeric video ID
+    const idMatch =
+      targetUrl.match(/(?:reel\/|videos\/|watch\/?[\?&]v=)(\d+)/i) ||
+      targetUrl.match(/\/(\d{10,})\b/);
+    const videoId = idMatch ? idMatch[1] : null;
+
+    // 3. Build candidate URLs to try in priority order
+    const urlsToTry = [];
+    if (videoId) {
+      urlsToTry.push(`https://www.facebook.com/watch/?v=${videoId}&_rdr`);
+      urlsToTry.push(`https://m.facebook.com/watch/?v=${videoId}&_rdr`);
+      urlsToTry.push(`https://www.facebook.com/reel/${videoId}`);
+      urlsToTry.push(`https://mbasic.facebook.com/video/video.php?v=${videoId}`);
+    }
+    urlsToTry.push(targetUrl.replace(/m\.facebook\.com/, "www.facebook.com"));
+
+    const baseHeaders = {
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
       "Accept-Language": "en-US,en;q=0.9",
-      "sec-fetch-site": "none",
-      "sec-fetch-mode": "navigate",
-      "sec-fetch-user": "?1",
-      "sec-fetch-dest": "document",
-      "upgrade-insecure-requests": "1",
+      "Sec-Fetch-Mode": "navigate",
     };
 
-// Fallback cookie session provided by user
-const DEFAULT_FB_COOKIE =
-  "sb=6RRJaHWbT9yUQ1m1pffyv5MB; datr=HF5faWjw00cA0hfsUENeiQSM; ps_l=1; ps_n=1; b_user=100015940210489; c_user=100015940210489; oo=v1; fr=1BSyVVj465XHxECH1.AWd1zfbhraXHhxD4Gx0PpC4G0OWB9hfvpWp-FTdzPFWZkrnUcTU.BqvIBt..AAA.0.0.BqvIBt.AWfdWC3kye59lSD0mFMujDrzUx8; xs=13%3AwswQLxw3sYRV9g%3A2%3A1790082718%3A-1%3A-1%3A%3AAcx_DPSPk93Y11wa5mRatEwR3ZMpgZlF_wPSOETJb7A; presence=C%7B%22t3%22%3A%5B%5D%2C%22utc3%22%3A1790741156025%2C%22v%22%3A1%7D; wd=1792x907";
+    const DEFAULT_FB_COOKIE =
+      "sb=6RRJaHWbT9yUQ1m1pffyv5MB; datr=HF5faWjw00cA0hfsUENeiQSM; ps_l=1; ps_n=1; b_user=100015940210489; c_user=100015940210489; oo=v1; fr=1BSyVVj465XHxECH1.AWd1zfbhraXHhxD4Gx0PpC4G0OWB9hfvpWp-FTdzPFWZkrnUcTU.BqvIBt..AAA.0.0.BqvIBt.AWfdWC3kye59lSD0mFMujDrzUx8; xs=13%3AwswQLxw3sYRV9g%3A2%3A1790082718%3A-1%3A-1%3A%3AAcx_DPSPk93Y11wa5mRatEwR3ZMpgZlF_wPSOETJb7A; presence=C%7B%22t3%22%3A%5B%5D%2C%22utc3%22%3A1790741156025%2C%22v%22%3A1%7D; wd=1792x907";
 
     const cookieVal = (typeof process !== "undefined" && process.env?.FACEBOOK_COOKIE)
       ? process.env.FACEBOOK_COOKIE
       : DEFAULT_FB_COOKIE;
-
-    if (cookieVal) {
-      headers["Cookie"] = cookieVal.replace(/^"|"$/g, "").trim();
-    }
 
     let html = "";
     let meta = {};
     let isLoginBlocked = false;
     let isServerBlocked = false;
 
-    // ─── Direct page scrape with session cookie & browser headers ────────────
-    for (const targetUrl of urlsToTry) {
+    // Helper to test if HTML contains media data
+    const hasMediaData = (content) =>
+      content.includes(".mp4") ||
+      content.includes("playable_url") ||
+      content.includes("browser_native") ||
+      content.includes("hd_src") ||
+      content.includes("sd_src") ||
+      content.includes("dash_manifest");
+
+    // Phase 1: Try public fetch first (cleanest, avoid 400 cookie rejection from FB CDN)
+    for (const fetchUrl of urlsToTry) {
       try {
-        const response = await fetchWithTimeout(targetUrl, { headers });
+        const response = await fetchWithTimeout(fetchUrl, {
+          headers: baseHeaders,
+          redirect: "follow",
+        });
 
         if (response.status === 400 || response.status === 429) {
           isServerBlocked = true;
@@ -64,7 +96,6 @@ const DEFAULT_FB_COOKIE =
         if (!response.ok) continue;
 
         const pageHtml = await response.text();
-
         if (
           pageHtml.includes("<title>Error</title>") &&
           pageHtml.includes("noindex,nofollow")
@@ -73,26 +104,49 @@ const DEFAULT_FB_COOKIE =
           continue;
         }
 
-        if (
-          pageHtml.includes("Log in to Facebook") ||
-          pageHtml.includes('id="login_form"')
-        ) {
-          isLoginBlocked = true;
-        }
-
-        html = pageHtml;
-        meta = extractMetaTags(html);
-        if (
-          html.includes(".mp4") ||
-          html.includes("playable_url") ||
-          html.includes("browser_native") ||
-          html.includes("hd_src") ||
-          html.includes("sd_src")
-        ) {
+        if (hasMediaData(pageHtml)) {
+          html = pageHtml;
+          meta = extractMetaTags(html);
           break;
         }
       } catch {
         // try next candidate
+      }
+    }
+
+    // Phase 2: If public fetch did not find media, retry with authenticated cookie
+    if (!html && cookieVal) {
+      const authHeaders = {
+        ...baseHeaders,
+        Cookie: cookieVal.replace(/^"|"$/g, "").trim(),
+      };
+
+      for (const fetchUrl of urlsToTry) {
+        try {
+          const response = await fetchWithTimeout(fetchUrl, {
+            headers: authHeaders,
+            redirect: "follow",
+          });
+
+          if (!response.ok) continue;
+
+          const pageHtml = await response.text();
+          if (
+            pageHtml.includes("Log in to Facebook") ||
+            pageHtml.includes('id="login_form"')
+          ) {
+            isLoginBlocked = true;
+            continue;
+          }
+
+          if (hasMediaData(pageHtml)) {
+            html = pageHtml;
+            meta = extractMetaTags(html);
+            break;
+          }
+        } catch {
+          // try next
+        }
       }
     }
 
@@ -102,7 +156,9 @@ const DEFAULT_FB_COOKIE =
       .replace(/&quot;/g, '"')
       .replace(/\\u003C/g, "<")
       .replace(/\\u003E/g, ">")
-      .replace(/\\u0025/g, "%");
+      .replace(/\\u00253D/gi, "=")
+      .replace(/\\u0025/g, "%")
+      .replace(/&amp;/g, "&");
 
     const title =
       meta["og:title"] ||
@@ -117,11 +173,14 @@ const DEFAULT_FB_COOKIE =
 
     // Search for direct fbcdn mp4 URLs (matches both unescaped and escaped forms)
     const rawMatches = [
-      ...html.matchAll(/https:(?:\\\/|\/)[^"'<>\s]+?\.mp4\?[^"'<>\s]+/gi),
+      ...unescaped.matchAll(/https:\/\/[^"'<>\s]+?\.mp4\?[^"'<>\s]+/gi),
     ];
     const rawMp4s = rawMatches.map((m) => {
-      let u = m[0].replaceAll("\\/", "/").replaceAll("\\u0026", "&");
-      return u.split(/\\u003C|<|&quot;|"|'|\s/)[0];
+      let u = m[0].split(/\\u003C|<|&quot;|"|'|\s/)[0];
+      return decodeHtmlEntities(u)
+        .replaceAll("&amp;", "&")
+        .replaceAll("\\u00253D", "=")
+        .replaceAll("%253D", "=");
     });
 
     if (rawMp4s.length > 0) {
@@ -129,8 +188,7 @@ const DEFAULT_FB_COOKIE =
       const uniqueVideos = [];
       const uniqueAudios = [];
 
-      for (const rawUrl of rawMp4s) {
-        const cleanUrl = decodeHtmlEntities(rawUrl);
+      for (const cleanUrl of rawMp4s) {
         const basePath = cleanUrl.split("?")[0];
         if (seenBases.has(basePath)) continue;
         seenBases.add(basePath);
@@ -169,7 +227,7 @@ const DEFAULT_FB_COOKIE =
       }
     }
 
-    // HD patterns (legacy)
+    // HD patterns (legacy fallback)
     if (mediaList.length === 0) {
       const hdMatch =
         /"browser_native_hd_url"\s*:\s*"([^"]+)"/i.exec(decodedHtml) ||
@@ -226,22 +284,6 @@ const DEFAULT_FB_COOKIE =
     }
 
     if (mediaList.length === 0) {
-      const isEmptyShell =
-        html.length > 0 &&
-        !html.includes("playable_url") &&
-        !html.includes("hd_src") &&
-        !html.includes("sd_src") &&
-        !html.includes(".mp4") &&
-        !meta["og:video"] &&
-        !meta["og:title"];
-
-      if (isServerBlocked || isEmptyShell) {
-        throw new Error(
-          "Facebook videos cannot be extracted without a login session from this server. " +
-          "Facebook now requires authentication for Reel/video access. " +
-          "Set the FACEBOOK_COOKIE environment variable (c_user + xs cookie values) to enable downloads."
-        );
-      }
       if (isLoginBlocked) {
         throw new Error(
           "Facebook requires login to access this Reel/video. The post may be " +
