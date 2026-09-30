@@ -34,3 +34,10 @@ yarn-error.log*
 # wrangler / cloudflare
 .wrangler/
 .mf/
+
+# Wrangler local secrets
+.dev.vars
+
+# Local session cookies
+*.cookies.txt
+.facebook_cookies.txt

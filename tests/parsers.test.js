@@ -95,7 +95,7 @@ test("createMediaResponse builds unified response structure with downloadUrl", (
   assert.equal(mediaItem.quality, "HD Without Watermark");
   assert.equal(mediaItem.format, "mp4");
   assert.equal(mediaItem.size, 10485760);
-  assert.ok(mediaItem.downloadUrl.startsWith("/api/download?url="));
+  assert.equal(mediaItem.downloadUrl, "https://tikwm.com/video_hd.mp4");
 });
 
 test("formatFileSize and formatDuration format metrics appropriately", () => {

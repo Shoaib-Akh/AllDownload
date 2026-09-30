@@ -123,7 +123,7 @@ test("POST /api/download generates download payload and proxy link", async () =>
   const data = await validRes.json();
   assert.equal(data.success, true);
   assert.equal(data.platform, "Instagram");
-  assert.ok(data.proxyDownloadUrl.includes("/api/download?url="));
+  assert.equal(data.infoEndpoint, "/api/info");
 });
 
 test("GET /api/download requires url parameter", async () => {
