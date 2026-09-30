@@ -5,7 +5,6 @@ import ComparisonTable from "@/components/home/ComparisonTable";
 import LatestUpdate from "@/components/home/LatestUpdate";
 import DownloadGuides from "@/components/home/DownloadGuides";
 import HomeFAQ from "@/components/home/HomeFAQ";
-import TrustDisclaimers from "@/components/home/TrustDisclaimers";
 
 export default function Home() {
   return (
@@ -17,7 +16,6 @@ export default function Home() {
       <LatestUpdate />
       <DownloadGuides />
       <HomeFAQ />
-      <TrustDisclaimers />
     </>
   );
 }

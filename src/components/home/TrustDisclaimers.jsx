@@ -47,14 +47,7 @@ export default function TrustDisclaimers() {
         </div>
 
         {/* Bottom Banner */}
-        <div className="p-8 rounded-2xl bg-gradient-to-r from-violet-100/60 via-slate-100/80 to-fuchsia-100/60 dark:from-violet-950/30 dark:via-gray-900/60 dark:to-fuchsia-950/30 border border-violet-200 dark:border-violet-500/20 text-center shadow-sm transition-colors">
-          <h4 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white mb-2 tracking-tight transition-colors">
-            Savefrompro
-          </h4>
-          <p className="text-slate-600 dark:text-gray-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed transition-colors">
-            A free, browser-based way to save public videos and photos from your favourite social platforms for personal, offline use.
-          </p>
-        </div>
+
       </div>
     </section>
   );

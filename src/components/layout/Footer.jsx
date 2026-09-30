@@ -1,12 +1,54 @@
 import Link from 'next/link';
-import { Download, Heart } from 'lucide-react';
+import { Download, Heart, Shield, Lock, AlertCircle } from 'lucide-react';
 import { PLATFORMS } from '@/lib/constants';
 
 export default function Footer() {
   return (
     <footer className="bg-slate-100/80 dark:bg-gray-950 border-t border-slate-200 dark:border-gray-800/50 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        {/* 3 Disclaimers Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {/* Card 1 */}
+          <div className="p-6 rounded-2xl bg-white dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800/70 hover:border-slate-300 dark:hover:border-gray-700/80 transition-colors shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-600/10 border border-violet-200 dark:border-violet-500/20 flex items-center justify-center mb-4 text-violet-600 dark:text-violet-400">
+              <Shield className="w-5 h-5" />
+            </div>
+            <h3 className="text-slate-900 dark:text-white font-bold text-base mb-2 transition-colors">
+              Copyright &amp; Fair Use
+            </h3>
+            <p className="text-slate-600 dark:text-gray-400 text-xs sm:text-sm leading-relaxed transition-colors">
+              Savefrompro is for personal use only. Respect creators’ copyrights. Never redistribute downloaded content without permission.
+            </p>
+          </div>
+
+          {/* Card 2 */}
+          <div className="p-6 rounded-2xl bg-white dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800/70 hover:border-slate-300 dark:hover:border-gray-700/80 transition-colors shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-600/10 border border-emerald-200 dark:border-emerald-500/20 flex items-center justify-center mb-4 text-emerald-600 dark:text-emerald-400">
+              <Lock className="w-5 h-5" />
+            </div>
+            <h3 className="text-slate-900 dark:text-white font-bold text-base mb-2 transition-colors">
+              Privacy Commitment
+            </h3>
+            <p className="text-slate-600 dark:text-gray-400 text-xs sm:text-sm leading-relaxed transition-colors">
+              We never collect, store, or sell your data. All requests are processed without retaining URLs, IPs, or files.
+            </p>
+          </div>
+
+          {/* Card 3 */}
+          <div className="p-6 rounded-2xl bg-white dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800/70 hover:border-slate-300 dark:hover:border-gray-700/80 transition-colors shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-600/10 border border-amber-200 dark:border-amber-500/20 flex items-center justify-center mb-4 text-amber-600 dark:text-amber-400">
+              <AlertCircle className="w-5 h-5" />
+            </div>
+            <h3 className="text-slate-900 dark:text-white font-bold text-base mb-2 transition-colors">
+              Platform Disclaimer
+            </h3>
+            <p className="text-slate-600 dark:text-gray-400 text-xs sm:text-sm leading-relaxed transition-colors">
+              Savefrompro is not affiliated with any platform or Snapchat. All trademarks belong to their respective owners.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pt-8 border-t border-slate-200/80 dark:border-gray-800/50">
           {/* Brand */}
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
@@ -18,7 +60,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-slate-600 dark:text-gray-400 text-sm leading-relaxed">
-              Free online video downloader. Download from 12+ platforms in HD quality.
+              A free, browser-based way to save public videos and photos from your favourite social platforms for personal, offline use.
             </p>
           </div>
 

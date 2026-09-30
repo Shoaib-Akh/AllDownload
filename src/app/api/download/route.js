@@ -32,8 +32,13 @@ export async function POST(request) {
   const { ipHash, userAgent, country } = getClientInfo(request);
 
   try {
-    const body = await request.json();
-    const { url, quality, title } = body;
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      body = {};
+    }
+    const { url, quality, title } = body || {};
 
     const validation = validateUrl(url);
     if (!validation.valid) {
@@ -129,6 +134,18 @@ export async function GET(request) {
         ipHash,
       });
       return new Response("Missing url query parameter", { status: 400 });
+    }
+
+    try {
+      new URL(mediaUrl);
+    } catch {
+      store.recordError({
+        type: "INVALID_PARAM",
+        message: "Invalid media url query parameter in streaming download",
+        url: mediaUrl,
+        ipHash,
+      });
+      return new Response("Invalid media url query parameter", { status: 400 });
     }
 
     // Clean filename
