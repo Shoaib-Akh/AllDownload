@@ -33,7 +33,7 @@ export async function extractPinterestMedia(url) {
             // Video pins
             if (pinData.videos?.video_list) {
               const vList = pinData.videos.video_list;
-              const qualities = ["V_720P", "V_EXP7", "V_HLSV4", "V_EXP4"];
+              const qualities = ["V_720P", "V_EXP7", "V_EXP4"];
 
               for (const q of qualities) {
                 if (vList[q]?.url) {

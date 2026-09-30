@@ -226,8 +226,74 @@ export function decodeHtmlEntities(str) {
     .replace(/\\u003e/g, ">");
 }
 
+/** Hostname patterns that serve direct media files we can safely redirect to */
+const ALLOWED_CDN_HOSTS = [
+  /\.fbcdn\.net$/i,
+  /\.cdninstagram\.com$/i,
+  /tiktokcdn\.com$/i,
+  /tikwm\.com$/i,
+  /\.twimg\.com$/i,
+  /snap\.com$/i,
+  /sc-cdn\.net$/i,
+  /\.jtvnw\.net$/i,
+  /\.ttvnw\.net$/i,
+  /\.dmcdn\.net$/i,
+  /\.vimeocdn\.com$/i,
+  /vimeo\.com$/i,
+  /v\.redd\.it$/i,
+  /\.redd\.it$/i,
+  /redditmedia\.com$/i,
+  /\.pinimg\.com$/i,
+  /pinterest\.com$/i,
+  /pinterest\.[a-z.]+$/i,
+  /licdn\.com$/i,
+  /\.threads\.net$/i,
+  /threads\.net$/i,
+  /dailymotion\.com$/i,
+  /\.dm\.gg$/i,
+  /proxy\.dailymotion\.com$/i,
+  /\/\/[^/]*twitch\.tv/i,
+];
+
 /**
- * Standard media response factory
+ * Returns true when `url` points to an allowed CDN host.
+ */
+export function isAllowedMediaHost(url) {
+  try {
+    const { hostname } = new URL(url);
+    return ALLOWED_CDN_HOSTS.some((re) => re.test(hostname));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Returns true when the URL looks like an HLS/DASH playlist, not a direct file.
+ */
+function isPlaylistUrl(url, format) {
+  if (!url) return false;
+  const u = url.toLowerCase().split("?")[0];
+  return (
+    u.endsWith(".m3u8") ||
+    u.endsWith(".mpd") ||
+    (typeof format === "string" &&
+      (format.toLowerCase() === "m3u8" ||
+        format.toLowerCase() === "mpd" ||
+        format.toLowerCase() === "hls" ||
+        format.toLowerCase() === "dash"))
+  );
+}
+
+/**
+ * Standard media response factory.
+ *
+ * Only direct MP4/WebM/MOV/MP3/audio/image files are included in the output.
+ * HLS (.m3u8) and DASH (.mpd) playlist entries are silently dropped.
+ * If **no** direct-file URLs remain after filtering, throws:
+ *   "This video is only available as a stream, not a downloadable file."
+ *
+ * `downloadUrl` is now the direct CDN URL itself — the browser downloads it
+ * straight from the platform CDN; no bytes pass through Cloudflare.
  */
 export function createMediaResponse({
   platform,
@@ -238,6 +304,21 @@ export function createMediaResponse({
   author,
   media = [],
 }) {
+  // Drop HLS / DASH playlist entries
+  const directMedia = media.filter(
+    (item) => item.url && !isPlaylistUrl(item.url, item.format)
+  );
+
+  if (directMedia.length === 0) {
+    throw new Error(
+      "This video is only available as a stream, not a downloadable file."
+    );
+  }
+
+  const safeTitle = (title || platform)
+    .slice(0, 50)
+    .replace(/[^a-zA-Z0-9_-]/g, "_");
+
   return {
     success: true,
     platform,
@@ -246,12 +327,14 @@ export function createMediaResponse({
     thumbnail: thumbnail || null,
     duration: duration || null,
     author: author || null,
-    media: media.map((item) => ({
+    media: directMedia.map((item) => ({
       quality: item.quality || "Standard",
       type: item.type || "video",
       format: item.format || "mp4",
       url: item.url,
-      downloadUrl: item.downloadUrl || `/api/download?url=${encodeURIComponent(item.url)}&filename=${encodeURIComponent((title || platform).slice(0, 50).replace(/[^a-zA-Z0-9_-]/g, "_"))}.${item.format || "mp4"}`,
+      // downloadUrl IS the direct CDN URL — browser fetches it directly.
+      // No video bytes pass through Cloudflare Workers.
+      downloadUrl: item.url,
       size: item.size || null,
     })),
   };

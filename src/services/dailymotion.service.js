@@ -61,15 +61,6 @@ export async function extractDailymotionMedia(url) {
             }
           }
 
-          // Also check auto / m3u8 stream
-          if (data.qualities.auto && data.qualities.auto[0]?.url) {
-            mediaList.push({
-              quality: "Adaptive Stream (HLS)",
-              type: "video",
-              format: "m3u8",
-              url: data.qualities.auto[0].url,
-            });
-          }
         }
       }
     } catch {

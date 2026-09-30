@@ -148,13 +148,10 @@ export default function DownloadResult({ result, onDownload }) {
                     )}
                   </button>
 
-                  {/* Download Button */}
-                  <a
-                    href={targetUrl}
-                    download
+                  {/* Download Button — fetches directly from CDN, no Cloudflare proxy */}
+                  <button
+                    type="button"
                     onClick={() => handleDownloadClick(item)}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="px-5 py-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-xs sm:text-sm font-semibold rounded-lg flex items-center gap-1.5 transition-all shadow-md hover:shadow-violet-500/20 active:scale-95"
                   >
                     {isDownloading ? (
@@ -168,7 +165,7 @@ export default function DownloadResult({ result, onDownload }) {
                         <span>Download</span>
                       </>
                     )}
-                  </a>
+                  </button>
                 </div>
               </div>
             );

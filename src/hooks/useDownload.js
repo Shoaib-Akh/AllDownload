@@ -132,46 +132,92 @@ export function useDownload() {
     }
   }, [saveToRecents]);
 
-  const triggerDownload = useCallback((mediaItem, title = "SaveFromPro_Video") => {
-    if (!mediaItem || (!mediaItem.url && !mediaItem.downloadUrl)) return;
+  const triggerDownload = useCallback(async (mediaItem, title = "SaveFromPro_Video") => {
+    if (!mediaItem || !mediaItem.url) return;
 
-    const downloadTarget = mediaItem.downloadUrl || mediaItem.url;
+    // downloadUrl IS the direct CDN URL (set by createMediaResponse)
+    const directUrl = mediaItem.downloadUrl || mediaItem.url;
+    const safeTitle = title.slice(0, 40).replace(/[^a-zA-Z0-9_-]/g, "_");
+    const ext = mediaItem.format || "mp4";
+    const filename = `${safeTitle}.${ext}`;
+
     setState((prev) => ({
       ...prev,
       status: "downloading",
-      downloadProgress: 15,
+      downloadProgress: 0,
       activeItemUrl: mediaItem.url,
     }));
 
-    // Trigger browser download via anchor element
-    const link = document.createElement("a");
-    link.href = downloadTarget;
-    link.download = `${title.slice(0, 40).replace(/[^a-zA-Z0-9_-]/g, "_")}.${mediaItem.format || "mp4"}`;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      // Attempt fetch so we can show real progress from Content-Length
+      const response = await fetch(directUrl, { method: "GET" });
 
-    // Simulated smooth progress feedback for client satisfaction
-    const interval = setInterval(() => {
-      setState((prev) => {
-        if (prev.downloadProgress >= 100) {
-          clearInterval(interval);
-          return {
-            ...prev,
-            status: "completed",
-            downloadProgress: 100,
-            activeItemUrl: null,
-          };
+      if (!response.ok) throw new Error("fetch_failed");
+
+      const contentLength = response.headers.get("content-length");
+      const total = contentLength ? parseInt(contentLength, 10) : 0;
+
+      // Read body as a stream to show progress
+      const reader = response.body?.getReader();
+      const chunks = [];
+      let received = 0;
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          received += value.length;
+          if (total > 0) {
+            setState((prev) => ({
+              ...prev,
+              downloadProgress: Math.min(99, Math.round((received / total) * 100)),
+            }));
+          }
         }
-        return {
-          ...prev,
-          downloadProgress: prev.downloadProgress + 25,
-        };
-      });
-    }, 180);
+      } else {
+        // No streaming support — read all at once
+        const buffer = await response.arrayBuffer();
+        chunks.push(new Uint8Array(buffer));
+        received = buffer.byteLength;
+      }
+
+      // Build blob and save
+      const contentType =
+        response.headers.get("content-type") || "application/octet-stream";
+      const blob = new Blob(chunks, { type: contentType });
+      const blobUrl = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Revoke after a short delay
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10_000);
+
+      setState((prev) => ({
+        ...prev,
+        status: "completed",
+        downloadProgress: 100,
+        activeItemUrl: null,
+      }));
+    } catch {
+      // CORS or network error — open CDN URL in a new tab as fallback.
+      // The file is served by the platform CDN; Cloudflare sends no video bytes.
+      window.open(directUrl, "_blank", "noopener,noreferrer");
+
+      setState((prev) => ({
+        ...prev,
+        status: "completed",
+        downloadProgress: 100,
+        activeItemUrl: null,
+      }));
+    }
   }, []);
+
 
   const copyDownloadLink = useCallback(async (linkUrl) => {
     try {

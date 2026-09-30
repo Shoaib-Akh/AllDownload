@@ -1,12 +1,12 @@
 import { validateUrl, getPlatformFromUrl } from "../../../lib/validators.js";
-import { DEFAULT_USER_AGENT, statsTracker } from "../../../services/base.js";
+import { statsTracker, isAllowedMediaHost } from "../../../services/base.js";
 import { store } from "../../../db/store.js";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 /**
- * Extract client IP or hash from request headers
+ * Extract client IP hash from request headers
  */
 function getClientInfo(request) {
   const forwarded = request.headers.get("x-forwarded-for");
@@ -14,7 +14,6 @@ function getClientInfo(request) {
   const userAgent = request.headers.get("user-agent") || "Browser";
   const country = request.headers.get("cf-ipcountry") || "Global";
 
-  // Quick 8-char hash
   let hash = 0;
   for (let i = 0; i < ip.length; i++) {
     hash = (hash << 5) - hash + ip.charCodeAt(i);
@@ -26,7 +25,12 @@ function getClientInfo(request) {
 }
 
 /**
- * POST /api/download: Validate and generate ready download payload
+ * POST /api/download
+ *
+ * Validates the page URL and records the attempt.
+ * Returns platform info and a pointer to /api/info so the browser can
+ * retrieve the real direct media files.
+ * The page URL is never treated as a downloadable file.
  */
 export async function POST(request) {
   const { ipHash, userAgent, country } = getClientInfo(request);
@@ -78,7 +82,7 @@ export async function POST(request) {
       );
     }
 
-    // Record success
+    // Record attempt
     statsTracker.recordDownload(platform.slug, `Download: ${platform.name}`, url);
     store.recordDownload({
       url,
@@ -91,11 +95,15 @@ export async function POST(request) {
       country,
     });
 
+    // Return platform info — direct file URLs come from /api/info, not here.
+    // We intentionally do NOT return the page URL as a downloadUrl.
     return Response.json({
       success: true,
       platform: platform.name,
-      downloadUrl: url,
-      proxyDownloadUrl: `/api/download?url=${encodeURIComponent(url)}&filename=SaveFromPro_${platform.slug}_video.mp4`,
+      platformSlug: platform.slug,
+      message:
+        "Use /api/info to retrieve the direct media files for this URL.",
+      infoEndpoint: "/api/info",
       quality: quality || "HD",
     });
   } catch (error) {
@@ -115,85 +123,68 @@ export async function POST(request) {
 }
 
 /**
- * GET /api/download?url=...&filename=...
- * Streams/proxies file directly to browser with Content-Disposition: attachment
+ * GET /api/download?url=...
+ *
+ * Returns a 302 redirect to the direct CDN file URL when the host is on the
+ * allowlist.  Rejects every other host with 400 so the route cannot be used
+ * as an open proxy that streams arbitrary bytes through Cloudflare.
+ *
+ * The browser then downloads the file directly from the CDN — zero video
+ * bytes pass through Cloudflare Workers.
  */
 export async function GET(request) {
-  const { ipHash, userAgent, country } = getClientInfo(request);
+  const { ipHash } = getClientInfo(request);
 
   try {
     const { searchParams } = new URL(request.url);
     const mediaUrl = searchParams.get("url");
-    let filename = searchParams.get("filename") || "SaveFromPro_video.mp4";
 
     if (!mediaUrl) {
       store.recordError({
         type: "MISSING_PARAM",
-        message: "Missing url query parameter in streaming download",
+        message: "Missing url query parameter in download redirect",
         url: "",
         ipHash,
       });
       return new Response("Missing url query parameter", { status: 400 });
     }
 
+    let parsedUrl;
     try {
-      new URL(mediaUrl);
+      parsedUrl = new URL(mediaUrl);
     } catch {
       store.recordError({
         type: "INVALID_PARAM",
-        message: "Invalid media url query parameter in streaming download",
+        message: "Invalid media url query parameter in download redirect",
         url: mediaUrl,
         ipHash,
       });
       return new Response("Invalid media url query parameter", { status: 400 });
     }
 
-    // Clean filename
-    filename = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-    if (!filename.includes(".")) {
-      filename += ".mp4";
+    // Only redirect to known CDN / platform hosts — closes the open proxy
+    if (!isAllowedMediaHost(mediaUrl)) {
+      store.recordError({
+        type: "BLOCKED_HOST",
+        message: `Rejected redirect to disallowed host: ${parsedUrl.hostname}`,
+        url: mediaUrl,
+        ipHash,
+      });
+      return new Response(
+        "This URL is not from a recognised media host and cannot be used for download.",
+        { status: 400 }
+      );
     }
 
-    // Fetch the remote file
-    const remoteResponse = await fetch(mediaUrl, {
-      headers: {
-        "User-Agent": DEFAULT_USER_AGENT,
-        Accept: "*/*",
-      },
-    });
-
-    if (!remoteResponse.ok) {
-      // If direct fetch fails (e.g. expired link), redirect as fallback
-      return Response.redirect(mediaUrl, 302);
-    }
-
-    const contentType =
-      remoteResponse.headers.get("content-type") || "application/octet-stream";
-    const contentLength = remoteResponse.headers.get("content-length");
-
-    const responseHeaders = new Headers();
-    responseHeaders.set("Content-Type", contentType);
-    responseHeaders.set(
-      "Content-Disposition",
-      `attachment; filename="${filename}"`
-    );
-    if (contentLength) {
-      responseHeaders.set("Content-Length", contentLength);
-    }
-    responseHeaders.set("Cache-Control", "public, max-age=3600");
-
-    // Return streamed body
-    return new Response(remoteResponse.body, {
-      status: 200,
-      headers: responseHeaders,
-    });
+    // 302 → browser fetches the file directly from the CDN
+    return Response.redirect(mediaUrl, 302);
   } catch (error) {
-    console.error("Download streaming error:", error);
+    console.error("Download redirect error:", error);
     store.recordError({
-      type: "STREAMING_ERROR",
-      message: error.message || "Error streaming media file",
+      type: "REDIRECT_ERROR",
+      message: error.message || "Error redirecting to media file",
       ipHash,
     });
-    return new Response("Error streaming media file", { status: 500 });
+    return new Response("Error redirecting to media file", { status: 500 });
   }
 }
