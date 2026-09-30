@@ -135,88 +135,103 @@ export function useDownload() {
   const triggerDownload = useCallback(async (mediaItem, title = "SaveFromPro_Video") => {
     if (!mediaItem || !mediaItem.url) return;
 
-    // downloadUrl IS the direct CDN URL (set by createMediaResponse)
     const directUrl = mediaItem.downloadUrl || mediaItem.url;
-    const safeTitle = title.slice(0, 40).replace(/[^a-zA-Z0-9_-]/g, "_");
+    const safeTitle = (title || "video").slice(0, 40).replace(/[^a-zA-Z0-9_-]/g, "_") || "video";
     const ext = mediaItem.format || "mp4";
     const filename = `${safeTitle}.${ext}`;
 
     setState((prev) => ({
       ...prev,
       status: "downloading",
-      downloadProgress: 0,
+      downloadProgress: 10,
       activeItemUrl: mediaItem.url,
     }));
 
+    const downloadEndpoint = `/api/download?url=${encodeURIComponent(directUrl)}&filename=${encodeURIComponent(filename)}`;
+
+    // Try fetching via direct URL first (if CORS allowed) or via our same-origin /api/download endpoint
+    let response = null;
     try {
-      // Attempt fetch so we can show real progress from Content-Length
-      const response = await fetch(directUrl, { method: "GET" });
-
-      if (!response.ok) throw new Error("fetch_failed");
-
-      const contentLength = response.headers.get("content-length");
-      const total = contentLength ? parseInt(contentLength, 10) : 0;
-
-      // Read body as a stream to show progress
-      const reader = response.body?.getReader();
-      const chunks = [];
-      let received = 0;
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          chunks.push(value);
-          received += value.length;
-          if (total > 0) {
-            setState((prev) => ({
-              ...prev,
-              downloadProgress: Math.min(99, Math.round((received / total) * 100)),
-            }));
-          }
-        }
-      } else {
-        // No streaming support — read all at once
-        const buffer = await response.arrayBuffer();
-        chunks.push(new Uint8Array(buffer));
-        received = buffer.byteLength;
-      }
-
-      // Build blob and save
-      const contentType =
-        response.headers.get("content-type") || "application/octet-stream";
-      const blob = new Blob(chunks, { type: contentType });
-      const blobUrl = URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      // Revoke after a short delay
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 10_000);
-
-      setState((prev) => ({
-        ...prev,
-        status: "completed",
-        downloadProgress: 100,
-        activeItemUrl: null,
-      }));
+      response = await fetch(directUrl, { method: "GET" });
+      if (!response.ok) throw new Error("direct_fetch_failed");
     } catch {
-      // CORS or network error — open CDN URL in a new tab as fallback.
-      // The file is served by the platform CDN; Cloudflare sends no video bytes.
-      window.open(directUrl, "_blank", "noopener,noreferrer");
-
-      setState((prev) => ({
-        ...prev,
-        status: "completed",
-        downloadProgress: 100,
-        activeItemUrl: null,
-      }));
+      // Direct fetch blocked by CORS (e.g. Facebook, Instagram) -> fetch via same-origin /api/download
+      try {
+        response = await fetch(downloadEndpoint, { method: "GET" });
+      } catch {
+        response = null;
+      }
     }
+
+    if (response && response.ok) {
+      try {
+        const contentLength = response.headers.get("content-length");
+        const total = contentLength ? parseInt(contentLength, 10) : 0;
+        const reader = response.body?.getReader();
+        const chunks = [];
+        let received = 0;
+
+        if (reader) {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value);
+            received += value.length;
+            if (total > 0) {
+              setState((prev) => ({
+                ...prev,
+                downloadProgress: Math.min(99, Math.round((received / total) * 100)),
+              }));
+            }
+          }
+        } else {
+          const buffer = await response.arrayBuffer();
+          chunks.push(new Uint8Array(buffer));
+        }
+
+        const contentType =
+          response.headers.get("content-type") || "application/octet-stream";
+        const blob = new Blob(chunks, { type: contentType });
+        const blobUrl = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 30_000);
+
+        setState((prev) => ({
+          ...prev,
+          status: "completed",
+          downloadProgress: 100,
+          activeItemUrl: null,
+        }));
+        return;
+      } catch (err) {
+        console.error("Stream reading error:", err);
+      }
+    }
+
+    // Direct browser save fallback without leaving page
+    // Trigger download via hidden anchor to /api/download (returns Content-Disposition: attachment)
+    const link = document.createElement("a");
+    link.href = downloadEndpoint;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setState((prev) => ({
+      ...prev,
+      status: "completed",
+      downloadProgress: 100,
+      activeItemUrl: null,
+    }));
   }, []);
+
 
 
   const copyDownloadLink = useCallback(async (linkUrl) => {

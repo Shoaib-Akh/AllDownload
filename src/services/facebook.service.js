@@ -119,7 +119,10 @@ const DEFAULT_FB_COOKIE =
     const rawMatches = [
       ...html.matchAll(/https:(?:\\\/|\/)[^"'<>\s]+?\.mp4\?[^"'<>\s]+/gi),
     ];
-    const rawMp4s = rawMatches.map((m) => m[0].replaceAll("\\/", "/").replaceAll("\\u0026", "&"));
+    const rawMp4s = rawMatches.map((m) => {
+      let u = m[0].replaceAll("\\/", "/").replaceAll("\\u0026", "&");
+      return u.split(/\\u003C|<|&quot;|"|'|\s/)[0];
+    });
 
     if (rawMp4s.length > 0) {
       const seenBases = new Set();

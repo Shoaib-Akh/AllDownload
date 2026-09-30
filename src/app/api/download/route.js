@@ -1,5 +1,5 @@
 import { validateUrl, getPlatformFromUrl } from "../../../lib/validators.js";
-import { statsTracker, isAllowedMediaHost } from "../../../services/base.js";
+import { statsTracker, isAllowedMediaHost, DEFAULT_USER_AGENT } from "../../../services/base.js";
 import { store } from "../../../db/store.js";
 
 export const runtime = "edge";
@@ -123,14 +123,11 @@ export async function POST(request) {
 }
 
 /**
- * GET /api/download?url=...
+ * GET /api/download?url=...&filename=...
  *
- * Returns a 302 redirect to the direct CDN file URL when the host is on the
- * allowlist.  Rejects every other host with 400 so the route cannot be used
- * as an open proxy that streams arbitrary bytes through Cloudflare.
- *
- * The browser then downloads the file directly from the CDN — zero video
- * bytes pass through Cloudflare Workers.
+ * Downloads the video directly to the user's browser with Content-Disposition: attachment.
+ * The file is saved directly onto the user's computer without navigating away or redirecting
+ * to third-party CDN pages.
  */
 export async function GET(request) {
   const { ipHash } = getClientInfo(request);
@@ -138,11 +135,12 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const mediaUrl = searchParams.get("url");
+    const filename = searchParams.get("filename") || "SaveFromPro_Video.mp4";
 
     if (!mediaUrl) {
       store.recordError({
         type: "MISSING_PARAM",
-        message: "Missing url query parameter in download redirect",
+        message: "Missing url query parameter in download request",
         url: "",
         ipHash,
       });
@@ -155,18 +153,18 @@ export async function GET(request) {
     } catch {
       store.recordError({
         type: "INVALID_PARAM",
-        message: "Invalid media url query parameter in download redirect",
+        message: "Invalid media url query parameter in download request",
         url: mediaUrl,
         ipHash,
       });
       return new Response("Invalid media url query parameter", { status: 400 });
     }
 
-    // Only redirect to known CDN / platform hosts — closes the open proxy
+    // Only allow known CDN / platform hosts — closes open proxy vulnerability
     if (!isAllowedMediaHost(mediaUrl)) {
       store.recordError({
         type: "BLOCKED_HOST",
-        message: `Rejected redirect to disallowed host: ${parsedUrl.hostname}`,
+        message: `Rejected download from disallowed host: ${parsedUrl.hostname}`,
         url: mediaUrl,
         ipHash,
       });
@@ -176,15 +174,49 @@ export async function GET(request) {
       );
     }
 
-    // 302 → browser fetches the file directly from the CDN
-    return Response.redirect(mediaUrl, 302);
+    const cleanFilename = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+    // Fetch the remote file stream directly from the platform CDN
+    const remoteResponse = await fetch(mediaUrl, {
+      headers: {
+        "User-Agent": DEFAULT_USER_AGENT,
+        Accept: "*/*",
+      },
+    });
+
+    if (!remoteResponse.ok) {
+      // Fallback redirect if CDN rejects server-side stream
+      return Response.redirect(mediaUrl, 302);
+    }
+
+    const contentType =
+      remoteResponse.headers.get("content-type") || "application/octet-stream";
+    const contentLength = remoteResponse.headers.get("content-length");
+
+    const responseHeaders = new Headers();
+    responseHeaders.set("Content-Type", contentType);
+    responseHeaders.set(
+      "Content-Disposition",
+      `attachment; filename="${cleanFilename}"`
+    );
+    if (contentLength) {
+      responseHeaders.set("Content-Length", contentLength);
+    }
+    responseHeaders.set("Cache-Control", "public, max-age=3600");
+    responseHeaders.set("Access-Control-Allow-Origin", "*");
+
+    return new Response(remoteResponse.body, {
+      status: 200,
+      headers: responseHeaders,
+    });
   } catch (error) {
-    console.error("Download redirect error:", error);
+    console.error("Download error:", error);
     store.recordError({
-      type: "REDIRECT_ERROR",
-      message: error.message || "Error redirecting to media file",
+      type: "DOWNLOAD_ERROR",
+      message: error.message || "Error processing media download",
       ipHash,
     });
-    return new Response("Error redirecting to media file", { status: 500 });
+    return new Response("Error processing media download", { status: 500 });
   }
 }
+
